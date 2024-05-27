@@ -3,7 +3,7 @@
 
 %%  1
 
-%%{
+%{
 hold on;
 grid on;
 xlabel('x');
@@ -11,7 +11,7 @@ ylabel('y');
 
 f = @(x) (0.5 - x).*(x <= 0.5) + cos(pi*x).*(x > 0.5);
 w = @(x) x.^2;
-T = @(n, x) sin(n * x) ./ x;
+T = @(mn, x) sin(mn * x) ./ x;
 
 a = 0;
 b = 1;
@@ -20,7 +20,7 @@ n_values = [5, 10, 20, 50];
 
 for n=n_values
   sum = @(x) 0;
-for i = 1:n
+  for i = 1:n
     mu_x=i;
     mu = @(x) tan(x);
     mu_guess = (mu_x-0.5) .*pi;
@@ -30,9 +30,9 @@ for i = 1:n
     denominator = integral(@(x) (T(mu_n, x).^2) .* w(x), a, b, 'ArrayValued', true);
 
     a_i = numerator/denominator;
-    last_sum = sum;
-    sum = @(x) last_sum(x)+a_i .*(sin(mu_n .* x)./x);
-end
+    prev_sum = sum;
+    sum = @(x) prev_sum(x)+a_i .*(sin(mu_n .* x)./x);
+  end
   handle = ezplot(sum, [0,1]);
   set(handle,'LineWidth',1);
 end
@@ -41,7 +41,7 @@ handle = ezplot(f, [0,1]);
 set(handle,'LineWidth',2);
 legend('F_5(x)', 'F_{10}(x)', 'F_{20}(x)', 'F_{50}(x)', 'f(x)');
 hold off;
-%%}
+%}
 
 
 %%  2
@@ -58,7 +58,7 @@ h = figure;
 surf(x, y, z1, 'FaceColor', 'yellow', 'FaceAlpha', 0.5, 'EdgeColor', 'none');
 hold on;
 
-surf(x, y, z2, 'FaceColor', 'blue', 'EdgeColor', 'none');
+surf(x, y, z2, 'FaceColor', 'blue', 'FaceAlpha', 0.5, 'EdgeColor', 'none');
 title('Поверхности функций eq_1 и eq_2');
 xlabel('x');
 ylabel('y');
@@ -98,13 +98,15 @@ end
 
 [~, idx_x] = min(abs(x(1, :) - b(1)));
 [~, idx_y] = min(abs(y(:, 1) - b(2)));
-min_index = [idx_x, idx_y];
 
-[dx, dy] = gradient(z2, 1, 1);
-normal_b = [dx(min_index), dy(min_index), -1] * 0.03;
+[dx, dy] = gradient(z2, x(1, 2) - x(1,1), y(2, 1) - y(1, 1));
+dzdx = dx(idx_y, idx_x);
+dzdy = dy(idx_y, idx_x);
+
+normal_b = [-dzdx, -dzdy, 1];
+normal_b = [normal_b(1), normal_b(2), normal_b(3)] / norm(normal_b);
+
 quiver3(b(1), b(2), b(3), normal_b(1), normal_b(2), normal_b(3), 'r', 'LineWidth', 2);
-
-normal_b = [normal_b(1), normal_b(2), normal_b(3)];
 
 ab = b - a;
 length_normal_b = norm(normal_b);
@@ -122,7 +124,7 @@ waitfor(h);
 %}
 
 %% 3
-%{
+%%{
 f = @(y) sin(y) ./ log(y + 1) - 3 * cos(y) ./ (2 * sqrt(y));
 F = @(x) arrayfun(@(x) integral(f, 0, x), x);
 
@@ -133,18 +135,17 @@ x_vals = linspace(0, 10, 100);
 zero_points = [];
 
 for i = 1:numel(x_vals) - 1
-    x0 = x_vals(i);
-    x1 = x_vals(i+1);
-    try
-      zero = fzero(F, [x0, x1]);
-      zero_points = [zero_points, zero];
-    catch
-    end
+  x0 = x_vals(i);
+  x1 = x_vals(i + 1);
+  try
+    zero = fzero(F, [x0, x1]);
+    zero_points = [zero_points, zero];
+  catch
+  end
 end
 
 disp('Нули F(x)');
 disp(num2str(zero_points));
-
 
 dFdx = diff(F_values) ./ diff(x);
 x_mid = (x(1:end-1) + x(2:end)) / 2;
@@ -159,4 +160,21 @@ end
 
 disp('Экстремумы F(x)');
 disp(num2str(extremums));
-%}
+
+figure;
+plot(x, F_values, 'b-', 'LineWidth', 4);
+hold on;
+
+plot(zero_points, zeros(size(zero_points)), 'ro', 'MarkerSize', 12, 'LineWidth', 5, 'DisplayName', 'Нули F(x)');
+
+extremum_y = arrayfun(F, extremums);
+plot(extremums, extremum_y, 'bo', 'MarkerSize', 12, 'DisplayName', 'LineWidth', 5, 'Экстремумы F(x)');
+
+legend('F(x)', 'Нули F(x)', 'Экстремумы F(x)');
+xlabel('x');
+ylabel('F(x)');
+title('График функции F(x) с отмеченными нулями и экстремумами');
+grid on;
+hold off;
+%%}
+
