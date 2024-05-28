@@ -34,11 +34,11 @@ for n=n_values
     sum = @(x) prev_sum(x)+a_i .*(sin(mu_n .* x)./x);
   end
   handle = ezplot(sum, [0,1]);
-  set(handle,'LineWidth',1);
+  set(handle,'LineWidth',3);
 end
 
 handle = ezplot(f, [0,1]);
-set(handle,'LineWidth',2);
+set(handle,'LineWidth',4);
 legend('F_5(x)', 'F_{10}(x)', 'F_{20}(x)', 'F_{50}(x)', 'f(x)');
 hold off;
 %}
@@ -65,7 +65,7 @@ ylabel('y');
 legend({'eq_1', 'eq_2'});
 a = [-4, 2, -100];
 plot3(a(1), a(2), a(3), 'o', 'MarkerSize', 3, 'MarkerFaceColor', 'yellow', 'MarkerEdgeColor', 'black');
-view(45, 20);
+view(-45, 20);
 light;
 material shiny;
 
@@ -161,14 +161,15 @@ end
 disp('Экстремумы F(x)');
 disp(num2str(extremums));
 
-figure;
+h = figure;
 plot(x, F_values, 'b-', 'LineWidth', 4);
 hold on;
+grid on;
 
-plot(zero_points, zeros(size(zero_points)), 'ro', 'MarkerSize', 12, 'LineWidth', 5, 'DisplayName', 'Нули F(x)');
+plot(zero_points, zeros(size(zero_points)), 'ro', 'MarkerSize', 12, 'LineWidth', 3, 'DisplayName', 'Нули F(x)');
 
 extremum_y = arrayfun(F, extremums);
-plot(extremums, extremum_y, 'bo', 'MarkerSize', 12, 'DisplayName', 'LineWidth', 5, 'Экстремумы F(x)');
+plot(extremums, extremum_y, 'bo', 'MarkerSize', 12, 'LineWidth', 3, 'DisplayName', 'Экстремумы F(x)');
 
 legend('F(x)', 'Нули F(x)', 'Экстремумы F(x)');
 xlabel('x');
@@ -176,5 +177,6 @@ ylabel('F(x)');
 title('График функции F(x) с отмеченными нулями и экстремумами');
 grid on;
 hold off;
+waitfor(h);
 %%}
 
