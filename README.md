@@ -1,2 +1,2 @@
-# edu_octave
+# edu_matlab
 Some matlab
