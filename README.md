@@ -1,2 +1,2 @@
 # edu_matlab
-Some matlab
+"Modern math packages" (on octave) course and control theory
